@@ -1,12 +1,12 @@
 const firebaseApp = firebase.initializeApp(
   {
-    apiKey: "AIzaSyDydCU0Fe2_TcJVB98idMF45dyz6423gxQ",
-    authDomain: "threads-clone-web.firebaseapp.com",
-    databaseURL: "https://threads-clone-web-default-rtdb.firebaseio.com",
-    projectId: "threads-clone-web",
-    storageBucket: "threads-clone-web.appspot.com",
-    messagingSenderId: "1093836480632",
-    appId: "1:1093836480632:web:4d9db806c2b1bb7a490d8d"
+    apiKey: "AIzaSyAgI_RgKuZnbSwRhC6qkbqyquxSOh4UEPI",
+    authDomain: "usre-table.firebaseapp.com",
+    databaseURL: "https://usre-table-default-rtdb.firebaseio.com",
+    projectId: "usre-table",
+    storageBucket: "usre-table.appspot.com",
+    messagingSenderId: "289710010510",
+    appId: "1:289710010510:web:0dc072b341ba87d84659df"
   });
 const db = firebaseApp.firestore();
 const database = firebaseApp.database();
@@ -44,6 +44,7 @@ let pstForm = document.getElementById('post-form');
 function posted() {
   let text = linky(caption.value);
   let username = document.getElementById('post-user').value;
+  let price = document.getElementById('post-price').value;
 
   if (!username) {
     useDefaultUsername();
@@ -62,13 +63,13 @@ function posted() {
         <td>\
           <div>\
             <div>\
-              <h5 class="mb-0">Necklace</h5>\
+              <h5 class="mb-0">' + username + '</h5>\
             </div>\
           </div>\
         </td>\
-        <td>50$</td>\
+        <td>' + price + '</td>\
         <td>\
-          Our necklace is made with high quality jewelry and is 17cm long</td>\
+        ' + text + '</td>\
         <td>\
           <div class="dropdown open">\
             <a href="#!" class="px-2" id="triggerId1" data-toggle="dropdown" aria-haspopup="true"\
@@ -88,6 +89,7 @@ function posted() {
 
   let threadData = {
     user: username,
+    Price: price,
     post: text,
   };
 
@@ -99,21 +101,17 @@ function posted() {
   document.getElementsByClassName('result')[0].innerHTML += postContainer;
 }
 
-let current = new Date();
-let options = { hour: 'numeric', minute: 'numeric', hour12: true };
-let time = current.toLocaleTimeString(undefined, options);
-console.log(time);
-document.getElementsByClassName('time')[0].innerHTML = time;
 
 function displayPostedData() {
   database.ref("threads").once("value")
     .then(snapshot => {
+      const resultContainer = document.getElementsByClassName('result')[0];
+      resultContainer.innerHTML = ''; // Clear existing data
+      
       snapshot.forEach(childSnapshot => {
-        const threadData = childSnapshot.val();
-       
-        const postContainer = createPostContainer(threadData.user, threadData.post, time);
-
-        document.getElementsByClassName('result').appendChild(postContainer);
+        let threadData = childSnapshot.val();
+        let postContainer = createPostContainer(threadData.user, threadData.post, threadData.Price);
+        resultContainer.appendChild(postContainer); // Append to the result container
       });
     })
     .catch(error => {
@@ -121,23 +119,23 @@ function displayPostedData() {
     });
 }
 
-function createPostContainer(username, text, time) {
+
+function createPostContainer(username, text, price) {
   const postContainer = document.createElement('div');
   postContainer.innerHTML = `\
   <table class="table">\
     <tbody>
       <tr>
         <td>
-          <div class="user-info">
-            <div class="user-info__basic">
-              <h5 class="mb-0">Necklace</h5>
+          <div>
+            <div>
+              <h5 class="mb-0">${username}</h5>
             </div>
           </div>
         </td>
-        <td>50$</td>
+        <td>${price}</td>
         <td>
-          Our necklace is made with high quality jewelry and is 17cm
-          long
+        ${text}
         </td>
         <td>
           <div class="dropdown open">
@@ -165,7 +163,7 @@ document.getElementById('post-form').addEventListener('submit', function(event) 
 
   database.ref("threads").push(threadData)
     .then(() => {
-      document.getElementsByClassName('mid-col')[0].innerHTML = '';
+      document.getElementsByClassName('result')[0].innerHTML = '';
 
       displayPostedData();
 
@@ -178,30 +176,12 @@ document.getElementById('post-form').addEventListener('submit', function(event) 
 
 displayPostedData();
 
-    // Check the current state of the media query on page load
-    const mediaQuery = window.matchMedia('(max-width: 768px)');
-    handleMediaQuery(mediaQuery);
-
-    // Add an event listener to track changes in the media query state
-    mediaQuery.addListener(handleMediaQuery);
-
-    // Function to handle media query changes
-    function handleMediaQuery(mediaQuery) {
-      if (mediaQuery.matches) {
-        console.log('Media query matched! Screen width is 600px or less.');
-        // Perform actions specific to small screens
-        const element = document.querySelector(".main")
-        element.classList.remove("grid");
-      } else {
-        console.log('Media query not matched! Screen width is larger than 600px.');
-        // Perform actions specific to larger screens
-        const element = document.querySelector(".main")
-        element.classList.add("grid");
-      }
-    }
     const formWrapper = document.querySelector(".formbold-form-wrapper");
     const formActionButton = document.querySelector(".formbold-action-btn");
     function chatboxToogleHandler() {
       formWrapper.classList.toggle("active");
       formActionButton.classList.toggle("active");
     }
+    document.addEventListener("DOMContentLoaded", function () {
+      displayPostedData();
+    });
